@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jgybzx.dao.UserDao">
+
+    <!--
+        insert into tab_user (字段名称, 字段名称) values(#{值1} , #{值2})
+    -->
+    <insert id="save">
+        insert into tab_user(uid,username,password,telephone,nickname,sex,birthday,email,pic)
+        values(#{uid},#{username},#{password},#{telephone},#{nickname},#{sex},#{birthday},#{email},#{pic})
+    </insert>
+    <select id="nameIfExists" resultType="java.lang.Integer">
+        select  count(*) from tab_user where username = #{username}
+    </select>
+    <select id="phoneIfExists" resultType="java.lang.Integer">
+        select  count(*) from tab_user where telephone = #{telephone}
+    </select>
+</mapper>

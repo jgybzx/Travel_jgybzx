@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="jdbc.properties"/>
+
+    <!--别名的配置-->
+    <typeAliases>
+        <package name="com.jgybzx.domain"/>
+
+    </typeAliases>
+    <!--   environments 环境  可以配置多个环境，默认 -->
+    <environments default="development">
+        <environment id="development"> <!--环境id-->
+            <transactionManager type="JDBC"/><!--事务管理器 帮助我们管理事务，使用JDBC-->
+            <!-- 连接池：数据源dataSource所有连接池都必须实现这个接口-->
+            <dataSource type="POOLED">
+                <!-- -->
+                <property name="driver" value="${jdbc.driver}"/>
+                <property name="url" value="${jdbc.url}"/>
+                <property name="username" value="${jdbc.username}"/>
+                <property name="password" value="${jdbc.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+    <!--    映射文件的指定-->
+    <mappers>
+
+
+        <package name="com.jgybzx.dao"/>
+
+    </mappers>
+</configuration>
