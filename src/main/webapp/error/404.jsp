@@ -11,7 +11,7 @@
 <!-- 头部 end -->
 <div style="height: 600px">
     <h3>对不起，您访问的资源不存在！</h3>
-    <a href="../index.jsp">返回首页</a>
+    <a href="${pageContext.request.contextPath}">返回首页</a>
 </div>
 </body>
 </html>

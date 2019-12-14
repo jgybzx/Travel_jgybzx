@@ -1,6 +1,10 @@
 package com.jgybzx.dao;
 
+import com.jgybzx.domain.Address;
 import com.jgybzx.domain.User;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author: guojy
@@ -16,5 +20,21 @@ public interface UserDao {
 
     int phoneIfExists(String telephone);
 
+
+    User findByNamePws(@Param("username") String username, @Param("password") String password);
+
+    User findByPhone(String telephone);
+
+    User findById(Integer uid);
+
+    void updateUser(User user);
+
+    List<Address> findUserAddress(Integer uid);
+
+    void saveAddress(Address address);
+
+    void setAddDef(Integer uid);
+
+    void initAdder(Integer uid);
 
 }

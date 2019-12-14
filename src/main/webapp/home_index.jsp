@@ -12,7 +12,7 @@
 </head>
 <body>
 <!--引入头部-->
-<%@include file="header.jsp"%>
+<%@include file="header.jsp" %>
 
 <div class="container-fluid">
     <!--header-->
@@ -20,7 +20,7 @@
         <div class="py-container">
             <div class="yui3-g home">
                 <!--左侧列表-->
-                <%@include file="home_left.jsp"%>
+                <%@include file="home_left.jsp" %>
                 <!--右侧主内容-->
                 <div class="yui3-u-5-6 order-pay">
                     <div class="body userInfo">
@@ -28,35 +28,38 @@
                             <li class="active"><a href="#one" data-toggle="tab">基本资料</a></li>
                             <li><a href="#two" data-toggle="tab">头像照片</a></li>
                         </ul>
-                        <form action="" method="post" enctype="multipart/form-data">
+                        <form action="${ctx}/UserServlet" method="post" enctype="multipart/form-data">
+                            <input type="text" name="action" value="updateUser" hidden>
+                            <input type="text" name="uid" value="${user.uid}">
                             <div class="tab-content ">
                                 <div id="one" class="tab-pane active">
                                     <div class="sui-form form-horizontal">
                                         <div class="control-group">
                                             <label for="inputName" class="control-label">昵称：</label>
                                             <div class="controls">
-                                                <input type="text" id="inputName" name="nickname" placeholder="昵称">
+                                                <input type="text" id="inputName" name="nickname" placeholder="昵称"
+                                                       value="${user.nickname}">
                                             </div>
                                         </div>
                                         <div class="control-group">
                                             <label class="control-label">性别：</label>
                                             <div class="controls">
 
-                                                <input type="radio" name="sex" value="1"><b>男</b>
-                                                &nbsp;&nbsp;
-                                                <input type="radio" name="sex" value="0"><b>女</b>
+                                                <input type="radio" name="sex" value="1" ${user.sex=='1'?"checked":""}><b>男</b>
+                                                <input type="radio" name="sex" value="0" ${user.sex=='0'?"checked":""}><b>女</b>
                                             </div>
                                         </div>
                                         <div class="control-group">
                                             <label class="control-label">生日：</label>
                                             <div class="controls">
-                                                <input type="text" name="birthday" placeholder="生日">
+                                                <input type="text" name="birthday" placeholder="生日"
+                                                       value="${user.birthday}">
                                             </div>
                                         </div>
                                         <div class="control-group">
                                             <label class="control-label">邮箱：</label>
                                             <div class="controls">
-                                                <input type="text" name="email" placeholder="邮箱">
+                                                <input type="text" name="email" placeholder="邮箱" value="${user.email}">
                                             </div>
                                         </div>
                                         <div class="control-group">
@@ -64,6 +67,7 @@
                                             <div class="controls">
                                                 <button type="submit" class="sui-btn btn-primary">更新</button>
                                             </div>
+
                                         </div>
                                     </div>
                                 </div>
@@ -91,7 +95,7 @@
 </div>
 </div>
 <!--引入尾部-->
-<%@include file="footer.jsp"%>
+<%@include file="footer.jsp" %>
 
 </body>
 </html>

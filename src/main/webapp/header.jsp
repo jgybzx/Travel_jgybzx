@@ -6,7 +6,8 @@
 <script src="js/jquery-3.3.1.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/getParameter.js"></script>
-
+<%--往域中放入一个键值对  key的名称是ctx 值是动态值 以后使用动态项目名称 ${ctx} 也可以 --%>
+<c:set var="ctx" value="${pageContext.request.contextPath}"></c:set>
 <!-- 头部 start -->
 <header id="header">
     <%--广告--%>
@@ -16,17 +17,33 @@
     <%--右侧按钮--%>
     <div class="shortcut">
         <!-- 未登录状态 -->
-		<div class="login_out">
-			<a id="loginBtn" data-toggle="modal" data-target="#loginModel" style="cursor: pointer;">登录</a>
-			<a href="register.jsp" style="cursor: pointer;">注册</a>
-		</div>
+        <c:if test="${empty loginUser}"><%--判断session中的loginUser是否为空，如果是空的，显示此div--%>
+            <div class="login_out">
+                <a id="loginBtn" data-toggle="modal" data-target="#loginModel" style="cursor: pointer;">登录</a>
+                <a href="register.jsp" style="cursor: pointer;">注册</a>
+
+            </div>
+        </c:if>
+        <c:if test="${not empty loginUser}"><%--如果不为空，则显示 欢迎**--%>
+            <div class="login">
+                <span>欢迎回来：<font color="#48d1cc" size="3px">${loginUser.username}&nbsp;&nbsp;&nbsp;&nbsp;</font></span>
+                <a href="${ctx}/UserServlet?action=findById" class="collection" >个人中心</a><%--当点击个人中心的时候，应该拿到user对象--%>
+                <a href="cart.jsp" class="collection">购物车</a>
+                <a href="javascript:void(0)" onclick="loginout()">退出</a>
+                <script>
+                    function loginout(){
+                        //询问框
+                        var flag = confirm("您是否要退出?");
+                        if(flag){//true 确定退出
+                            //异步 $.post()   同步  location.href="";
+                            location.href="${ctx}/UserServlet?action=loginout";
+                        }
+                    }
+                </script>
+            </div>
+        </c:if>
         <!-- 登录状态 -->
-		<div class="login">
-			<span>欢迎回来，${currentUser.username}</span>
-			<a href="home_index.jsp" class="collection">个人中心</a>
-			<a href="cart.jsp" class="collection">购物车</a>
-			<a href="index.jsp">退出</a>
-		</div>
+
     </div>
     <%--搜索框--%>
     <div class="header_wrap">
@@ -84,6 +101,7 @@
                         </li>
                         <li><a href="#telReg" data-toggle="tab">短信登录</a></li>
                     </ul>
+                    <%--错误提示框--%>
                     <span id="loginErrorMsg" style="color: red;"></span>
                 </h4>
 
@@ -110,6 +128,27 @@
                             <input type="reset" class="btn btn-primary" value="重置">
                             <input type="button" id="pwdLogin" class="btn btn-primary" value="登录"/>
                         </div>
+                        <script>
+                            $(function () {
+                                $("#pwdLogin").click(function () {
+                                    //获取表单数据
+                                    var params = $("#pwdLoginForm").serialize();
+                                    var url = "${pageContext.request.contextPath}/UserServlet";
+                                    $.post(url, params, function (resultInfo) {
+                                        if (resultInfo.flag) {
+                                            // alert("登陆成功");
+                                            //登陆成功，直接刷新
+                                            location.reload();
+                                        } else {
+                                            // alert("登陆失败")
+                                            //登陆失败，取出失败信息，显示在错误提示span中
+                                            $("#loginErrorMsg").html(resultInfo.errorMsg);
+                                        }
+                                    }, "json")
+                                    // alert(params);
+                                })
+                            })
+                        </script>
                     </form>
                 </div>
                 <%--短信登录--%>
@@ -129,10 +168,46 @@
                             </div>
                             <a href="javaScript:void(0)" id="login_sendSmsCode">发送手机验证码</a>
                         </div>
+                        <script>
+                            $(function () {
+                                //动态绑定发送手机验证码，href="javaScript:void(0) 阻止链接
+                                $("#login_sendSmsCode").click(function () {
+                                    // alert("绑定")
+                                    //1。获得表单手机号数据
+                                    let login_telephone =  $("#login_telephone").val();
+                                    //2。发送ajax请求
+                                    let url = "${ctx}/UserServlet";
+                                   let params = {"login_telephone":login_telephone,"action":"phoneSendCode"}
+                                    $.post(url,params,function (data) {
+                                        if(data=="1"){//表示发送成功
+                                            alert("验证码发送成功")
+                                        }
+                                    })
+                                })
+                            })
+                        </script>
                         <div class="modal-footer">
                             <input type="reset" class="btn btn-primary" value="重置">
                             <input type="button" class="btn btn-primary" id="telLogin" value="登录"/>
                         </div>
+                        <script>
+                            //登陆ajax，需要需要传递的参数  有  action:telLogin，phone，和code
+                            $(function () {
+                                $("#telLogin").click(function () {
+                                    //1.获取表单数据
+                                    let params = $("#telLoginForm").serialize();
+                                    let url = "${ctx}/UserServlet";
+                                    $.post(url,params,function (resultInfo) {
+                                        if(resultInfo.flag){
+                                            location.reload();
+                                        }else{
+                                            $("#loginErrorMsg").html(resultInfo.errorMsg);
+                                        }
+                                    },"json")
+                                })
+                            })
+                            //1.获得表单数据
+                        </script>
                     </form>
                 </div>
             </div>

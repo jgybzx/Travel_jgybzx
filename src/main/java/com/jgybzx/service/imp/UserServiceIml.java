@@ -1,12 +1,17 @@
 package com.jgybzx.service.imp;
 
 import com.jgybzx.dao.UserDao;
+import com.jgybzx.domain.Address;
 import com.jgybzx.domain.ResultInfo;
 import com.jgybzx.domain.User;
 import com.jgybzx.service.UserService;
 import com.jgybzx.utils.Md5Utils;
 import com.jgybzx.utils.MyBatisUtils;
+import jdk.nashorn.internal.ir.CallNode;
 import org.apache.ibatis.session.SqlSession;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: guojy
@@ -87,4 +92,124 @@ public class UserServiceIml implements UserService {
         MyBatisUtils.close(sqlSession);
         return resultInfo;
     }
+
+    /**
+     * 验证用户名和密码
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    @Override
+    public ResultInfo findByNamePws(String username, String password) {
+
+        ResultInfo resultInfo = null;
+        SqlSession sqlSession = MyBatisUtils.openSession();
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            //通过用户名密码，查询数据库，返回一个用户的信息，将其放到resultInfo的data中，返回给页面
+            //因为登录完，页面还要显示 欢迎 ***，所以就可以直接从resultInfo的data中取出对象，获得username
+            System.out.println("username = " + username);
+            System.out.println("password = " + password);
+            User user = userDao.findByNamePws(username, password);
+            System.out.println("user = " + user);
+            //判断是否有这个用户
+            if (user == null) {//没有找到数据
+                resultInfo = new ResultInfo(false, "用户名或密码不正确", null);
+            } else {//如果找到 数据，将ueser返回
+                resultInfo = new ResultInfo(true, "", user);
+            }
+        } finally {
+            MyBatisUtils.close(sqlSession);
+        }
+        return resultInfo;
+    }
+
+    @Override
+    public ResultInfo findByPhone(String telephone) {
+        ResultInfo resultInfo = null;
+        SqlSession sqlSession = MyBatisUtils.openSession();
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            User user = userDao.findByPhone(telephone);
+            if (user != null) {
+                resultInfo = new ResultInfo(true, "", user);
+
+            } else {
+                resultInfo = new ResultInfo(false, "手机号输入错误", "");
+            }
+        } finally {
+            MyBatisUtils.close(sqlSession);
+        }
+        return resultInfo;
+    }
+
+    @Override
+    public User findById(Integer uid) {
+        User user = null;
+        SqlSession sqlSession = MyBatisUtils.openSession();
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            user=userDao.findById(uid);
+        } finally {
+            MyBatisUtils.close(sqlSession);
+        }
+        return user;
+    }
+
+    @Override
+    public void updateUser(User user) {
+        SqlSession sqlSession = MyBatisUtils.openSession();
+
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            userDao.updateUser(user);
+        }finally {
+            MyBatisUtils.close(sqlSession);
+        }
+    }
+
+    @Override
+    public List<Address> findUserAddress(Integer uid) {
+        List<Address> addresses = new ArrayList<>();
+        SqlSession sqlSession = MyBatisUtils.openSession();
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            addresses =userDao.findUserAddress(uid);
+            System.out.println(addresses);
+        }finally {
+            MyBatisUtils.close(sqlSession);
+        }
+        return addresses;
+    }
+
+    @Override
+    public ResultInfo saveAddress(Address address) {
+        ResultInfo resultInfo =null;
+        SqlSession sqlSession = MyBatisUtils.openSession();
+
+        try {
+            UserDao userDao = sqlSession.getMapper(UserDao.class);
+            //保存不会返回影响几行，只会直接报错，所以如果报错失败直接进catch
+            userDao.saveAddress(address);
+            resultInfo = new ResultInfo(true,"","保存地址成功");
+        } catch (Exception e) {
+            resultInfo = new ResultInfo(false , "保存地址失败" ,"");
+        } finally {
+            MyBatisUtils.close(sqlSession);
+        }
+
+        return resultInfo;
+    }
+
+    @Override
+    public void setAddDef(Integer uid, Integer addressId) {
+        SqlSession sqlSession = MyBatisUtils.openSession();
+        UserDao userDao = sqlSession.getMapper(UserDao.class);
+        userDao.initAdder(uid);
+        userDao.setAddDef(addressId);
+        MyBatisUtils.close(sqlSession);
+
+    }
+
 }

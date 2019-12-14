@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.jgybzx.dao.UserDao">
 
     <!--
@@ -11,10 +11,75 @@
         insert into tab_user(uid,username,password,telephone,nickname,sex,birthday,email,pic)
         values(#{uid},#{username},#{password},#{telephone},#{nickname},#{sex},#{birthday},#{email},#{pic})
     </insert>
+    <!--保存地址-->
+    <insert id="saveAddress"><!--注意类属性名和表字段不一致的情况，比如isDefault，表中是is_default-->
+        insert into tab_address(aid,uid,contact,address,telephone,is_default)
+        values(#{aid},#{user.uid},#{contact},#{address},#{telephone},#{isDefault})
+    </insert>
+    <!--更新用户-->
+    <update id="updateUser">
+        <!--注意，更新数据不一定全部更新，所以需要if判断，使用动态sql-->
+        update tab_user
+        <set>
+
+            <if test="username!=null and username !=''">
+                username = #{username},
+            </if>
+            <if test="password!=null and password !=''">
+                password = #{password},
+            </if>
+            <if test="telephone!=null and telephone !=''">
+                telephone = #{telephone},
+            </if>
+            <if test="nickname!=null and nickname !=''">
+                nickname = #{nickname},
+            </if>
+            <if test="sex!=null and sex !=''">
+                sex = #{sex},
+            </if>
+            <if test="birthday!=null and birthday !=''">
+                birthday = #{birthday},
+            </if>
+            <if test="email!=null and email !=''">
+                email = #{email},
+            </if>
+            <if test="pic!=null and pic !=''">
+                pic = #{pic},
+            </if>
+
+        </set>
+        where uid =#{uid}
+    </update>
+    <!--更新默认值，-->
+    <update id="setAddDef">
+        update tab_address set is_default = 1 where aid =#{addressId}
+    </update>
+    <!--将默认值全部变为0-->
+    <update id="initAdder">
+        update tab_address set is_default = 0 where uid =#{uid}
+    </update>
+    <!--判断用户是否存在-->
     <select id="nameIfExists" resultType="java.lang.Integer">
-        select  count(*) from tab_user where username = #{username}
+        select count(*) from tab_user where username = #{username}
     </select>
+    <!--判断电话是否存在-->
     <select id="phoneIfExists" resultType="java.lang.Integer">
-        select  count(*) from tab_user where telephone = #{telephone}
+        select count(*) from tab_user where telephone = #{telephone}
+    </select>
+    <!--通过用户名和密码 进行登陆-->
+    <select id="findByNamePws" resultType="com.jgybzx.domain.User">
+        select * from tab_user where username = #{username} and password = #{password}
+    </select>
+    <!--通过手机号查询用户，手机号和验证码登陆 使用-->
+    <select id="findByPhone" resultType="com.jgybzx.domain.User">
+        select * from tab_user where telephone = #{telephone}
+    </select>
+    <!--通过用户id查找用户，个人中心显示使用-->
+    <select id="findById" resultType="com.jgybzx.domain.User">
+        select * from tab_user where uid = #{uid}
+    </select>
+    <!--通过用户uid，获取对应的地址信息-->
+    <select id="findUserAddress" resultType="com.jgybzx.domain.Address">
+        select *,tab_address.is_default as isDefault  from tab_address where uid = #{uid}
     </select>
 </mapper>

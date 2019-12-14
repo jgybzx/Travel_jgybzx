@@ -39,7 +39,7 @@ public class SendCodeUtils {
             code += random.nextInt(9) + 1;//阿里云的验证码，不能以0开头，会直接忽略所以 要从1到9
         }
 
-        SendCodeUtils.sendSms(phone, code);
+       // SendCodeUtils.sendSms(phone, code);
         return code;
     }
 

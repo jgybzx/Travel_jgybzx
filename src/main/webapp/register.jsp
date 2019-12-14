@@ -104,7 +104,7 @@
                                         $("#passwordInfo").html("<font color='red'>密码不能为空✘</font>");
                                         return;
                                     } else {
-                                        $("#passwordInfo").html("<font color='red'>✔</font>");
+                                        $("#passwordInfo").html("<font color='green'>✔</font>");
                                     }
                                 }
                             </script>

@@ -8,6 +8,7 @@ import java.util.UUID;
 public final class UuidUtils {
 	private UuidUtils(){}
 	public static String getUuid(){
+		//自动生成的是 36的字符，中间有四个横杠，所以需要替换掉
 		return UUID.randomUUID().toString().replace("-","");
 	}
 	/**
