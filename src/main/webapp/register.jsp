@@ -68,14 +68,14 @@
                         <script>
                             function ifPhoneExistAjax() {
                                 var telephoneVal = $("#telephone").val();
-                                var reg = /1[3584]\d{9}/;
+                                var reg = /1[35784]\d{9}/;
                                 if (telephoneVal == "") {
                                     $("#telephoneInfo").html("<font color='red'>手机号不能为空✘</font>");
                                     return;
-                                }/*else if(reg.test(telephoneVal)){
-                                    $("#telephoneInfo").html("<font color='red'>手机号不足11位✘</font>");
-                                    return ;
-                                }*/
+                                } else if (!reg.test(telephoneVal)) {
+                                    $("#telephoneInfo").html("<font color='red'>手机号格式不正确✘</font>");
+                                    return;
+                                }
                                 var $url = "${pageContext.request.contextPath}/UserServlet";
                                 var params = {"telephoneVal": telephoneVal, "action": "ifPhoneExistAjax"}
 
@@ -116,23 +116,44 @@
                         </td>
                         <td class="td_right check">
                             <input type="text" id="smsCode" name="smsCode" class="check" placeholder="请输入验证码">
-                            <a href="javaScript:void(0)" onclick="senCode()">发送手机验证码</a>
+                            <span id="sendloginCode"><a href="javaScript:void(0)" onclick="senCode()">发送手机验证码</a></span>
+
                             <script>
                                 function senCode() {
 
                                     //发送手机验证码，异步请求
                                     var phone = $("#telephone").val();
                                     var $url = "${pageContext.request.contextPath}/UserServlet";
-                                    var params = {"phone": phone, "action": "sendCode"}
-                                    alert(phone)
-                                    $.post($url, params, function (resultInfo) {
-                                        if (resultInfo.flag) {
-                                            $("#msg").html(resultInfo.data);
-                                        } else {
-                                            $("#msg").html(resultInfo.errorMsg);
-                                        }
+                                    var params = {"phone": phone, "action": "sendCode"};
+                                    // alert("手机号" + phone)
+                                    var reg = /1[35784]\d{9}/;
+                                    if (phone === "") {
+                                        alert("手机号不能为空");
+                                    } else if (!reg.test(phone)) { //手机号为空不能注册
+                                        alert("手机号格式不正确");
+                                        return false;
+                                    } else {
+                                        $.post($url, params, function (resultInfo) {
+                                            if (resultInfo.flag) {
+                                                $("#msg").html(resultInfo.data);
+                                            } else {
+                                                $("#msg").html(resultInfo.errorMsg);
+                                            }
 
-                                    }, "json")
+                                        }, "json")
+                                        //设置定时器
+                                        // alert("响应成功")
+                                        var time = 6;
+                                        var Interval = setInterval(function () {
+
+                                            $("#sendloginCode").html(" <a>" + (--time) + "秒后重新发送</a>");
+                                            if (time == 0) {
+                                                $("#sendloginCode").html("<a href=\"javaScript:void(0)\" onclick=\"senCode()\">发送手机验证码</a>");
+                                                clearInterval(Interval);
+                                            }
+                                        }, 1000)
+                                    }
+
                                 }
                             </script>
                         </td>

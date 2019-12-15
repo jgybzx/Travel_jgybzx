@@ -30,7 +30,7 @@
                         </ul>
                         <form action="${ctx}/UserServlet" method="post" enctype="multipart/form-data">
                             <input type="text" name="action" value="updateUser" hidden>
-                            <input type="text" name="uid" value="${user.uid}">
+                            <input type="text" name="uid" value="${user.uid}" hidden>
                             <div class="tab-content ">
                                 <div id="one" class="tab-pane active">
                                     <div class="sui-form form-horizontal">
@@ -77,7 +77,7 @@
                                         <p>当前头像：</p>
                                         <div class="upload">
                                             <img id="imgShow_WU_FILE_0" width="100" height="100"
-                                                 src="img/_/photo_icon.png"
+                                                 src="${pageContext.request.contextPath}/${loginUser.pic}"
                                                  alt="">
                                             <input type="file" id="up_img_WU_FILE_0" name="pic"/>
                                         </div>

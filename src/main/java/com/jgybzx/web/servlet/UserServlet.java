@@ -7,13 +7,12 @@ import com.jgybzx.domain.ResultInfo;
 import com.jgybzx.domain.User;
 import com.jgybzx.service.UserService;
 import com.jgybzx.service.imp.UserServiceIml;
-import com.jgybzx.utils.Md5Utils;
-import com.jgybzx.utils.SendCodeUtils;
-import com.jgybzx.utils.UuidUtils;
+import com.jgybzx.utils.*;
 import com.jgybzx.web.Base.BaseServlet;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -41,17 +40,6 @@ import java.util.Map;
 @MultipartConfig
 //WebServlet(name = "UserServlet",urlPatterns="/UserServlet")
 public class UserServlet extends BaseServlet {
-   /* protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if ("register".equals(action)) {
-            //注册
-            this.UserRegister(request, response);
-        }else if("ifNameExistAjax".equals(action)){
-            this.ifNameExistAjax(request,response);
-        }else if("ifPhoneExistAjax".equals(action)){
-            this.ifPhoneExistAjax(request,response);
-        }
-    }*/
 
     /**
      * 注册   获取数据并封装
@@ -63,22 +51,35 @@ public class UserServlet extends BaseServlet {
      */
     public void register(HttpServletRequest request, HttpServletResponse response) throws ServletException,
             IOException {
+        Jedis jedisBean =null;
         try {
-            //从session中获取验证码
+            /*//从session中获取验证码
             String code = (String) request.getSession().getAttribute("code");
-            System.out.println("session中获取验证码" + code);
+            System.out.println("session中获取验证码" + code);*/
+
+            //优化，从缓存redis中获取验证码 REGISTER_CODE_
+            //获取手机号
+            String telephone = request.getParameter("telephone");
+            //获取jedis对象
+             jedisBean = RedisUtils.getJedisBean();
+            String code =jedisBean.get("REGISTER_CODE_"+telephone);
+
+
+
             //获取前台输入的验证码
             String smsCode = request.getParameter("smsCode");
             System.out.println("前台输入的验证码" + smsCode);
             //判断用户输入的验证码是否为空和 是否一致
             if (!StringUtils.isBlank(smsCode) && code.equals(smsCode)) {
+                //如果一致，清空缓存中的相关数据
+                jedisBean.del("REGISTER_CODE_"+telephone);
                 //获取表单数据
                 Map<String, String[]> map = request.getParameterMap();
                 //数据封装
                 User user = new User();
                 BeanUtils.populate(user, map);
                 //调用service，传递数据
-                UserService userService = new UserServiceIml();
+                UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
                 userService.saveUser(user);
                 //通知用户是否成功，重定向到注册成功页面  register_ok.jsp
                 response.sendRedirect(request.getContextPath() + "/register_ok.jsp");
@@ -92,6 +93,8 @@ public class UserServlet extends BaseServlet {
             //e.getMessage()，得到错误信息，请求转发到注册页面进行显示
             request.setAttribute("msg", e.getMessage());
             request.getRequestDispatcher("/register.jsp").forward(request, response);
+        }finally {
+            jedisBean.close();
         }
 
     }
@@ -109,7 +112,7 @@ public class UserServlet extends BaseServlet {
             IOException {
         //取出名字判断是否存在
         String usernameVal = request.getParameter("usernameVal");
-        UserService userService = new UserServiceIml();
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         ResultInfo resultInfo = userService.ifNameExistAjax(usernameVal);
         //将对象转换为json
         String json = new ObjectMapper().writeValueAsString(resultInfo);
@@ -127,7 +130,7 @@ public class UserServlet extends BaseServlet {
     public void ifPhoneExistAjax(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //取出手机号判断是否已经存在
         String telephoneVal = request.getParameter("telephoneVal");
-        UserService userService = new UserServiceIml();
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         ResultInfo resultInfo = userService.ifPhoneExistAjax(telephoneVal);
         //将对象转换为json
         String json = new ObjectMapper().writeValueAsString(resultInfo);
@@ -135,7 +138,7 @@ public class UserServlet extends BaseServlet {
     }
 
     /**
-     * 接收手机号  发送验证码
+     * 接收手机号  发送验证码，注册使用
      *
      * @param request
      * @param response
@@ -150,8 +153,18 @@ public class UserServlet extends BaseServlet {
             String code = SendCodeUtils.SendCode(phone);
             System.out.println("手机号" + phone);
             System.out.println("验证码" + code);
-            //将验证吗放在session中，方便获取对比 用户输入的验证吗
-            request.getSession().setAttribute("code", code);
+
+
+
+            /*//将验证码放在session中，方便获取对比 用户输入的验证吗
+            request.getSession().setAttribute("code", code);*/
+            //将验证码放在 redis中，设置有效时间,并且要考虑每个用户一个验证码，跟手机绑定
+            Jedis jedisBean = RedisUtils.getJedisBean();
+            jedisBean.set("REGISTER_CODE_"+phone,code);
+            jedisBean.close();
+
+
+
             //响应页面
             resultInfo = new ResultInfo(true, "", "发送短信成功");
             System.out.println("发送短信成功");
@@ -182,7 +195,8 @@ public class UserServlet extends BaseServlet {
         String password = request.getParameter("password");
         String Md5password = Md5Utils.encodeByMd5(password);
         //调用service
-        UserService userService = new UserServiceIml();
+//        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         resultInfo = userService.findByNamePws(username, Md5password);
 
         //response.getWriter().print("数据查询到了");
@@ -213,9 +227,16 @@ public class UserServlet extends BaseServlet {
             //2.发送验证码
             String code = SendCodeUtils.SendCode(login_telephone);
             System.out.println("code = " + code);
-            //3.此处需要将验证码存入session，因为，登陆的时候，还要取出code进行判断
-            request.getSession().setAttribute("loginCode", code);
-            response.getWriter().print("1");//ajax响应数据
+            /*//3.此处需要将验证码存入session，因为，登陆的时候，还要取出code进行判断
+            request.getSession().setAttribute("loginCode", code);*/
+
+
+            //优化代码，将验证码存入缓存中，一段时间失效，一个用户对象一个code，手机绑定
+            Jedis jedisBean = RedisUtils.getJedisBean();
+            jedisBean.set("LOGIN_CODE_"+login_telephone,code);
+            jedisBean.close();
+
+            response.getWriter().print("1");//ajax响应数据,1表示成功
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -237,11 +258,20 @@ public class UserServlet extends BaseServlet {
         String telephone = request.getParameter("telephone");
         //2.获取验证码
         String smsCode = request.getParameter("smsCode");
-        //3.获取session中的验证码
-        String loginCode = (String) request.getSession().getAttribute("loginCode");
+        System.out.println(smsCode);
+        /*//3.获取session中的验证码
+        String loginCode = (String) request.getSession().getAttribute("loginCode");*/
+        //优化代码，从缓存中取出数据，一旦登陆成功，验证码失效 LOGIN_CODE_
+        Jedis jedisBean = RedisUtils.getJedisBean();
+        String loginCode =jedisBean.get("LOGIN_CODE_"+telephone);
+
+
         //比对验证码是否相同
         if (StringUtils.equals(smsCode, loginCode)) {//String工具类
-            UserService userService = new UserServiceIml();
+            //如果验证码比对成功，清空缓存数据
+            jedisBean.del("LOGIN_CODE_"+telephone);
+            UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
+
             resultInfo = userService.findByPhone(telephone);
             if (resultInfo.getFlag()) {//如果如果获取到了用户，那么将用户数据放在session中
                 request.getSession().setAttribute("loginUser", resultInfo.getData());
@@ -249,6 +279,7 @@ public class UserServlet extends BaseServlet {
         } else {
             resultInfo = new ResultInfo(false, "验证码不一致", "");
         }
+        jedisBean.close();
         //响应数据
         String json = new ObjectMapper().writeValueAsString(resultInfo);
         response.getWriter().print(json);
@@ -274,7 +305,7 @@ public class UserServlet extends BaseServlet {
         User loginUser = (User) request.getSession().getAttribute("loginUser");
         Integer uid = loginUser.getUid();
         //1.1,调用service获取用户
-        UserService userService = new UserServiceIml();
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         User user = userService.findById(uid);
         System.out.println("user = " + user);
         //2.设置数据，请求转发
@@ -295,7 +326,7 @@ public class UserServlet extends BaseServlet {
         try {
             //1。获取表单数据
             Map<String, String[]> parameterMap = request.getParameterMap();
-            User user = new User();
+            User user= (User) request.getSession().getAttribute("loginUser");//取出session中的对象
             BeanUtils.populate(user, parameterMap);
 
             //2。获取图片数据.getPart("pic");,参数是input 标签里边的name
@@ -306,7 +337,7 @@ public class UserServlet extends BaseServlet {
                 //将图片存储到本地磁盘  一般放在项目部署的路径下
                 //1、获得img在本地的真实路径
                 String realPath = request.getServletContext().getRealPath("/img/");
-                System.out.println("realPath = " + realPath);
+//                System.out.println("realPath = " + realPath);
 
                 //2.为了防止同名过图片覆盖，随机生成图片的名字
                 String filename = UuidUtils.getUuid().toString() + ".png";
@@ -324,11 +355,14 @@ public class UserServlet extends BaseServlet {
                 outputStream.close();
                 //写入文件之后，将文件的地址存储到user对象中，然后写入数据库
                 //页面获取图片时，肯定是获取项目根目录来获取，${pageContext.request.contextPath}，所以只需要写上图片的上级目录  img即可
+
                 user.setPic("img/" + filename);
             }
             //将数据写入到数据库
-            UserService userService = new UserServiceIml();
+            UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
             userService.updateUser(user);
+            //将修改之后的user设置回session
+            request.getSession().setAttribute("loginUser", user);
             //响应重定向一下
             response.sendRedirect(request.getContextPath() + "/UserServlet?action=findById");
         } catch (Exception e) {
@@ -349,12 +383,12 @@ public class UserServlet extends BaseServlet {
         System.out.println("findUserAddress执行");
         User loginUser = (User) request.getSession().getAttribute("loginUser");
         Integer uid = loginUser.getUid();
-        System.out.println(loginUser);
-        UserService userService = new UserServiceIml();
+//        System.out.println(loginUser);
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         List<Address> addressList = userService.findUserAddress(uid);
-        for (Address address : addressList) {
-            System.out.println("address = " + address);
-        }
+//        for (Address address : addressList) {
+//            System.out.println("address = " + address);
+//        }
         request.setAttribute("addressList", addressList);
         //由于要显示在页面，所以请求转发
         request.getRequestDispatcher("home_address.jsp").forward(request, response);
@@ -375,7 +409,7 @@ public class UserServlet extends BaseServlet {
             Address address = new Address();
             BeanUtils.populate(address,parameterMap);
             //获取到的数据 很少，只有姓名 地址，联系电话，但是address类中还有idDefault和 User，所以需要手动添加
-            UserService userService = new UserServiceIml();
+            UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
             address.setIsDefault("0");//手动设置为非默认
             address.setUser((User) request.getSession().getAttribute("loginUser"));
             resultInfo=userService.saveAddress(address);
@@ -399,7 +433,7 @@ public class UserServlet extends BaseServlet {
         System.out.println("setAddDef执行");
         //获取session中的user
         User loginUser = (User) request.getSession().getAttribute("loginUser");
-        UserService userService = new UserServiceIml();
+        UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         //获取页面传递的 地址id
         String aid = request.getParameter("aid");
         int addressId = Integer.parseInt(aid);

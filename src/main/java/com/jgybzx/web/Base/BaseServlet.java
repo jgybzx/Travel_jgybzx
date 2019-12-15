@@ -56,6 +56,7 @@ public class BaseServlet extends HttpServlet {
             method.invoke(this,request,response);
 
         } catch (Exception e) {
+            System.out.println("BaseServlet报错");
             e.printStackTrace();
         }
     }

@@ -27,16 +27,16 @@
         <c:if test="${not empty loginUser}"><%--如果不为空，则显示 欢迎**--%>
             <div class="login">
                 <span>欢迎回来：<font color="#48d1cc" size="3px">${loginUser.username}&nbsp;&nbsp;&nbsp;&nbsp;</font></span>
-                <a href="${ctx}/UserServlet?action=findById" class="collection" >个人中心</a><%--当点击个人中心的时候，应该拿到user对象--%>
+                <a href="${ctx}/UserServlet?action=findById" class="collection">个人中心</a><%--当点击个人中心的时候，应该拿到user对象--%>
                 <a href="cart.jsp" class="collection">购物车</a>
                 <a href="javascript:void(0)" onclick="loginout()">退出</a>
                 <script>
-                    function loginout(){
+                    function loginout() {
                         //询问框
                         var flag = confirm("您是否要退出?");
-                        if(flag){//true 确定退出
+                        if (flag) {//true 确定退出
                             //异步 $.post()   同步  location.href="";
-                            location.href="${ctx}/UserServlet?action=loginout";
+                            location.href = "${ctx}/UserServlet?action=loginout";
                         }
                     }
                 </script>
@@ -72,17 +72,26 @@
 <!-- 首页导航 -->
 <div class="navitem">
     <ul class="nav" id="categoryUI">
-        <li class="nav-active"><a href="index.jsp">首页</a></li>
-        <li><a href="route_list.jsp">周边游</a></li>
-        <li><a href="route_list.jsp">山水游</a></li>
-        <li><a href="route_list.jsp">古镇游</a></li>
-        <li><a href="route_list.jsp">出境游</a></li>
-        <li><a href="route_list.jsp">国内游</a></li>
-        <li><a href="route_list.jsp">港澳游</a></li>
-        <li><a href="route_list.jsp">台湾游</a></li>
-        <li><a href="route_list.jsp">5A景点游</a></li>
-        <li><a href="route_list.jsp">全球自由行</a></li>
+        <%--        <li><a href="route_list.jsp">数据库数据</a></li>--%>
     </ul>
+    <script>
+        //页面加载时，数据库获得数据，tab_category
+        $(function () {
+            var url = "${ctx}/CategoryServlet";
+            var params = "action=showCategory";//查询数据库不需要参数
+            // 返回的数据类型[{"cid":8,"cname":"5A景点游"},{"cid":9,"cname":"全球自由行"}]
+            $.post(url, params, function (resultData) {
+                var json = eval(resultData);
+                //遍历输出
+                var str = " <li class=\"nav-active\"><a href=\"index.jsp\">首页</a></li>"
+                $.each(json, function (index, value) {
+                    str += "<li><a href=\"route_list.jsp\">" + value.cname + "</a></li>"
+                })
+                $("#categoryUI").html(str);
+            }, "json")
+        })
+
+    </script>
 </div>
 <!-- 登录模态框 -->
 <div class="modal fade" id="loginModel" tabindex="-1" role="dialog" aria-labelledby="loginModelLable">
@@ -159,32 +168,58 @@
                             <div class="form-group">
                                 <label>手机号</label>
                                 <input type="text" class="form-control" name="telephone" id="login_telephone"
-                                       placeholder="请输入手机号">
+                                       placeholder="请输入手机号" onblur="phoneFormt()">
                             </div>
+                            <script>
+                                function phoneFormt() {
+                                    var reg = /1[3579]\d{9}/;
+                                    var login_telephone = $("#login_telephone").val();
+                                    if (login_telephone === "") {
+                                        alert("手机号不能为空")
+                                    } else if (!reg.test(login_telephone)) {
+                                        alert("手机格式不正确");
+                                    }
+                                }
+                            </script>
                             <div class="form-group">
                                 <label>手机验证码</label>
                                 <input type="text" class="form-control" id="login_check" name="smsCode"
                                        placeholder="请输入手机验证码">
                             </div>
-                            <a href="javaScript:void(0)" id="login_sendSmsCode">发送手机验证码</a>
+                            <span id="sendCode"><a href="javaScript:void(0)" id="login_sendSmsCode"  onclick="loginSendCode()">发送手机验证码</a></span>
                         </div>
                         <script>
-                            $(function () {
-                                //动态绑定发送手机验证码，href="javaScript:void(0) 阻止链接
-                                $("#login_sendSmsCode").click(function () {
-                                    // alert("绑定")
-                                    //1。获得表单手机号数据
-                                    let login_telephone =  $("#login_telephone").val();
+                            //动态绑定发送手机验证码，href="javaScript:void(0) 阻止链接
+                            function loginSendCode() {
+                                // alert("绑定");
+                                //1。获得表单手机号数据
+                                let login_telephone = $("#login_telephone").val();
+                                if (login_telephone === "") {
+                                    alert("手机号不能为空");
+                                    return;
+                                } else {
                                     //2。发送ajax请求
                                     let url = "${ctx}/UserServlet";
-                                   let params = {"login_telephone":login_telephone,"action":"phoneSendCode"}
-                                    $.post(url,params,function (data) {
-                                        if(data=="1"){//表示发送成功
+                                    let params = {"login_telephone": login_telephone, "action": "phoneSendCode"}
+                                    $.post(url, params, function (data) {
+                                        if (data === "1") {//表示发送成功
                                             alert("验证码发送成功")
                                         }
+                                        var time = 6;
+                                        var Interval = setInterval(function () {
+                                            $("#sendCode").html(" <a>" + (--time) + "秒后重新发送</a>")
+                                            if (time === 0) {
+
+                                                $("#sendCode").html("<a href=\"javaScript:void(0)\" id=\"login_sendSmsCode\"  onclick=\"loginSendCode()\">发送手机验证码</a>");
+                                                clearInterval(Interval);
+                                            }
+
+                                        }, 1000)
+
                                     })
-                                })
-                            })
+                                }
+
+                            }
                         </script>
                         <div class="modal-footer">
                             <input type="reset" class="btn btn-primary" value="重置">
@@ -197,13 +232,13 @@
                                     //1.获取表单数据
                                     let params = $("#telLoginForm").serialize();
                                     let url = "${ctx}/UserServlet";
-                                    $.post(url,params,function (resultInfo) {
-                                        if(resultInfo.flag){
+                                    $.post(url, params, function (resultInfo) {
+                                        if (resultInfo.flag) {
                                             location.reload();
-                                        }else{
+                                        } else {
                                             $("#loginErrorMsg").html(resultInfo.errorMsg);
                                         }
-                                    },"json")
+                                    }, "json")
                                 })
                             })
                             //1.获得表单数据
