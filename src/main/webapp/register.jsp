@@ -4,6 +4,70 @@
     <meta charset="utf-8">
     <title>注册</title>
     <link rel="stylesheet" href="css/register.css">
+    <%--Ajax 异步请求验证账号是否存在--%>
+    <script>
+        function ifNameExistAjax() {
+            //    获取数据，ajax发送请求，接受返回信息，显示返回信息
+            var usernameVal = $("#username").val();
+            if (usernameVal === "") {
+                $("#userInfo").html("<font color='red'>用户名不能为空✘</font>");
+                return;
+            }
+            //发送数据,由于要发送到servlet，所以要指定action,所以 参数有俩，需要使用json
+            var params = {"usernameVal": usernameVal, "action": "ifNameExistAjax"}
+
+            var $url = "${pageContext.request.contextPath}/UserServlet";
+            $.post($url, params, function (resultInfo) {
+                /*{flag: true, errorMsg: "用户名可用", data: null}*/
+                console.log(resultInfo);
+                if (resultInfo.flag) {
+                    $("#userInfo").html("<font color='green'>" + resultInfo.data + "✔</font>");//绿色输出可用
+                } else {
+                    $("#userInfo").html("<font color='red'>" + resultInfo.errorMsg + "✘</font>");//红色输出已存在
+                }
+            }, "json")
+        }
+    </script>
+    <%--表单验证以及Ajax验证手机号是否存在，--%>
+    <script>
+        function ifPhoneExistAjax() {
+            var telephoneVal = $("#telephone").val();
+            // alert(telephoneVal)
+            var reg = /^1[35784]\d{9}$/;
+            if (telephoneVal === "") {
+                $("#telephoneInfo").html("<font color='red'>手机号不能为空✘</font>");
+                return;
+            } else if (!reg.test(telephoneVal)) {
+                $("#telephoneInfo").html("<font color='red'>手机号格式不正确✘</font>");
+                return;
+            }
+            var $url = "${pageContext.request.contextPath}/UserServlet";
+            var params = {"telephoneVal": telephoneVal, "action": "ifPhoneExistAjax"}
+
+            $.post($url, params, function (resultInfo) {
+                console.log(resultInfo);
+                if (resultInfo.flag) {
+                    $("#telephoneInfo").html("<font color='green'>" + resultInfo.data +
+                        "✔</font>");//绿色输出可用
+                } else {
+                    $("#telephoneInfo").html("<font color='red'>" + resultInfo.errorMsg + "✘</font>");//红色输出已存在
+                }
+            }, "json")
+        }
+    </script>
+    <%--注册页面密码验证--%>
+    <script>
+        function isNull() {
+            if ($("#password").val() == "") {
+                $("#passwordInfo").html("<font color='red'>密码不能为空✘</font>");
+                return;
+            } else {
+                $("#passwordInfo").html("<font color='green'>✔</font>");
+            }
+        }
+    </script>
+    <%--注册页面，发送手机验证码--%>
+
 </head>
 <body>
 <!--引入头部-->
@@ -32,29 +96,7 @@
                             <span id="userInfo" style="font-size:10px"></span>
                         </td>
                         <%--Ajax 异步请求验证账号是否存在--%>
-                        <script>
-                            function ifNameExistAjax() {
-                                //    获取数据，ajax发送请求，接受返回信息，显示返回信息
-                                var usernameVal = $("#username").val();
-                                if (usernameVal == "") {
-                                    $("#userInfo").html("<font color='red'>用户名不能为空✘</font>");
-                                    return;
-                                }
-                                //发送数据,由于要发送到servlet，所以要指定action,所以 参数有俩，需要使用json
-                                var params = {"usernameVal": usernameVal, "action": "ifNameExistAjax"}
 
-                                var $url = "${pageContext.request.contextPath}/UserServlet";
-                                $.post($url, params, function (resultInfo) {
-                                    /*{flag: true, errorMsg: "用户名可用", data: null}*/
-                                    console.log(resultInfo);
-                                    if (resultInfo.flag) {
-                                        $("#userInfo").html("<font color='green'>" + resultInfo.data + "✔</font>");//绿色输出可用
-                                    } else {
-                                        $("#userInfo").html("<font color='red'>" + resultInfo.errorMsg + "✘</font>");//红色输出已存在
-                                    }
-                                }, "json")
-                            }
-                        </script>
                     </tr>
                     <tr>
                         <td class="td_left">
@@ -65,31 +107,8 @@
                                    onblur="ifPhoneExistAjax()">
                             <span id="telephoneInfo" style="font-size:10px"></span>
                         </td>
-                        <script>
-                            function ifPhoneExistAjax() {
-                                var telephoneVal = $("#telephone").val();
-                                var reg = /1[35784]\d{9}/;
-                                if (telephoneVal == "") {
-                                    $("#telephoneInfo").html("<font color='red'>手机号不能为空✘</font>");
-                                    return;
-                                } else if (!reg.test(telephoneVal)) {
-                                    $("#telephoneInfo").html("<font color='red'>手机号格式不正确✘</font>");
-                                    return;
-                                }
-                                var $url = "${pageContext.request.contextPath}/UserServlet";
-                                var params = {"telephoneVal": telephoneVal, "action": "ifPhoneExistAjax"}
+                        <%--表单验证以及Ajax验证手机号是否存在，--%>
 
-                                $.post($url, params, function (resultInfo) {
-                                    console.log(resultInfo);
-                                    if (resultInfo.flag) {
-                                        $("#telephoneInfo").html("<font color='green'>" + resultInfo.data +
-                                            "✔</font>");//绿色输出可用
-                                    } else {
-                                        $("#telephoneInfo").html("<font color='red'>" + resultInfo.errorMsg + "✘</font>");//红色输出已存在
-                                    }
-                                }, "json")
-                            }
-                        </script>
                     </tr>
                     <tr>
                         <td class="td_left">
@@ -98,16 +117,8 @@
                         <td class="td_right">
                             <input type="password" id="password" name="password" placeholder="请输入密码" onblur="isNull()">
                             <span id="passwordInfo" style="font-size:10px"></span>
-                            <script>
-                                function isNull() {
-                                    if ($("#password").val() == "") {
-                                        $("#passwordInfo").html("<font color='red'>密码不能为空✘</font>");
-                                        return;
-                                    } else {
-                                        $("#passwordInfo").html("<font color='green'>✔</font>");
-                                    }
-                                }
-                            </script>
+                            <%--注册页面密码验证--%>
+
                         </td>
                     </tr>
                     <tr>
@@ -116,8 +127,9 @@
                         </td>
                         <td class="td_right check">
                             <input type="text" id="smsCode" name="smsCode" class="check" placeholder="请输入验证码">
-                            <span id="sendloginCode"><a href="javaScript:void(0)" onclick="senCode()">发送手机验证码</a></span>
-
+                            <%--注册页面--%>
+                            <span id="sendregisterCode"><a href="javaScript:void(0)" onclick="senCode()">发送手机验证码</a></span>
+                            <%--注册页面，发送手机验证码--%>
                             <script>
                                 function senCode() {
 
@@ -143,10 +155,10 @@
                                         }, "json")
                                         //设置定时器
                                         // alert("响应成功")
-                                        var time = 6;
+                                        var time = 60;
                                         var Interval = setInterval(function () {
 
-                                            $("#sendloginCode").html(" <a>" + (--time) + "秒后重新发送</a>");
+                                            $("#sendregisterCode").html(" <a>" + (--time) + "秒后重新发送</a>");
                                             if (time == 0) {
                                                 $("#sendloginCode").html("<a href=\"javaScript:void(0)\" onclick=\"senCode()\">发送手机验证码</a>");
                                                 clearInterval(Interval);

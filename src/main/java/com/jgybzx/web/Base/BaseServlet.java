@@ -49,9 +49,9 @@ public class BaseServlet extends HttpServlet {
         try {
             //获取action，
             String action = request.getParameter("action");
-            System.out.println(action);
+            System.out.println("action = " + action);
             Class aClass = this.getClass();
-            Method method = aClass.getMethod(action, HttpServletRequest.class, HttpServletResponse.class);
+            Method method = aClass.getDeclaredMethod(action, HttpServletRequest.class, HttpServletResponse.class);
             method.setAccessible(true);
             method.invoke(this,request,response);
 

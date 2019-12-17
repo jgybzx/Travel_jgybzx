@@ -14,7 +14,7 @@ import java.util.ResourceBundle;
  * @version:
  */
 public class RedisUtils {
-    //首先需要初始化一个池，但是考虑到，每次调用都会创建一个，节省资源，想到静态加载，
+    //首先需要初始化一个池，但是考虑到，每次调用都会创建一个，为了节省资源，想到静态加载，
     private static JedisPool jedisPool = null;
 
     static {

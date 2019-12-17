@@ -35,7 +35,7 @@ public class CategoryServiceIml implements CategoryService {
                 //将list转化为json存入缓存
                 String json = new ObjectMapper().writeValueAsString(list);
                 jedisBean.set("CATEGORY_LIST_JSON", json);
-                System.out.println("数据库中的数据");
+//                System.out.println("数据库中的数据");
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -45,7 +45,7 @@ public class CategoryServiceIml implements CategoryService {
             //那么将缓存中的json数据，转换成list
             try {
                 list = new ObjectMapper().readValue(category_list_json, List.class);
-                System.out.println("缓存中的数据");
+//                System.out.println("缓存中的数据");
             } catch (IOException e) {
                 System.out.println("转换json失败");
                 e.printStackTrace();

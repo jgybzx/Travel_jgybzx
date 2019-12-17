@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
-
+<c:set var="ctx" value="${pageContext.request.contextPath}"></c:set>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,45 +26,56 @@
                     <span>商品信息</span>
                     <span class="jg">价格</span>
                 </div>
-                <ul>
-                    <li>
-                        <div class="img"><img src="images/04-search_03.jpg" width="300px" alt=""></div>
-                        <div class="text1">
-                            <p>【减100元 含除夕/春节出发】广州增城三英温泉度假酒店/自由行套票</p>
-                            <br/>
-                            <p>1-2月出发，网付立享￥1099/2人起！爆款位置有限，抢完即止！</p>
-                        </div>
-                        <div class="price">
-                            <p class="price_num">
-                                <span>&yen;</span>
-                                <span>299</span>
-                                <span>起</span>
-                            </p>
-                            <p><a href="route_detail.jsp">查看详情</a></p>
-                        </div>
-                    </li>
-                   
-                </ul>
+                <c:forEach items="${pageBean.data}" var="data" >
+                    <ul>
+                        <li>
+                            <div class="img"><img src="${data.rimage}" width="300px" alt=""></div>
+                            <div class="text1">
+                                <p>${data.rname}</p>
+                                <br/>
+                                <p>${data.routeIntroduce}</p>
+                            </div>
+                            <div class="price">
+                                <p class="price_num">
+                                    <span>&yen;</span>
+                                    <span>${data.price}</span>
+                                    <span>起</span>
+                                </p>
+                                <p><a href="route_detail.jsp">查看详情</a></p>
+                            </div>
+                        </li>
+                    </ul>
+                </c:forEach>
+
                 <div class="page_num_inf">
                     <i></i> 共
-                    <span>12</span>页<span>132</span>条
+                    <span>${pageBean.totalPage}</span>页<span>${pageBean.totalCount}</span>条
                 </div>
                 <div class="pageNum">
                     <ul>
-                        <li><a href="">首页</a></li>
-                        <li class="threeword"><a href="#">上一页</a></li>
-                        <li class="curPage"><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                        <li><a href="#">6</a></li>
-                        <li><a href="#">7</a></li>
-                        <li><a href="#">8</a></li>
-                        <li><a href="#">9</a></li>
-                        <li><a href="#">10</a></li>
-                        <li class="threeword"><a href="javascript:;">下一页</a></li>
-                        <li class="threeword"><a href="javascript:;">末页</a></li>
+                        <li><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=1&pageSize=5&cid=${cid}">首页</a></li>
+                        <li class="threeword"><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=${pageBean.pageNumber-1}&pageSize=5&cid=${cid}">${num}>上一页</a></li>
+                        <%--
+                            类比百度，每一行就只有10个页码，如果直接从   1到 totalPage 遍历出来，显然不合理，
+                            所以我们也需要控制一下，每一行显示的个数，当前页前 有 5 个  当前页后 有4个，加起来一共  10个
+                            所以 forEach 的begin和end，就不能从 1 开始了，需要 一个动态的数据，也就是
+                            begin = pageNumber-5
+                            end = pageNumber + 4
+                            所以后台必须给我们传递过来这个值，最终想到，关于页面数据，全都封装在 pageBean中，于是要再加两个属性
+                            startNumber 和  endNumber
+                        --%>
+                        <c:forEach var="num" begin="${pageBean.startNumber}" end="${pageBean.endNumber}" step="1">
+                            <c:if test="${pageBean.pageNumber==num}">
+                                <li class="curPage"><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=${num}&pageSize=5&cid=${cid}">${num}</a></li>
+                            </c:if>
+                            <c:if test="${pageBean.pageNumber!=num}">
+                                <li><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=${num}&pageSize=5&cid=${cid}">${num}</a></li>
+                            </c:if>
+                        </c:forEach>
+
+
+                        <li class="threeword"><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=${pageBean.pageNumber+1}&pageSize=5&cid=${cid}">${num}>下一页</a></li>
+                        <li class="threeword"><a href="${ctx}/RouteServlet?action=findAllByCid&pageNumber=${pageBean.totalPage}&pageSize=5&cid=${cid}">末页</a></li>
                     </ul>
                 </div>
             </div>

@@ -55,7 +55,7 @@ public class UserServiceIml implements UserService {
 
     @Override//ajax判断名字是否存在
     //第一次考虑，返回一个行数，让servlet判断是否该如何处理,但是由于ajax不能使用请求或者转发，只能使用getWriter(),
-    //使用流返回 不支持对象格式 只支持字符串 或者 字节，然而我们不仅需要返回一个行数，还要让用户知道一个信息
+    //使用流返回 不支持对象格式 只支持字符串 或者 字节，然而我们不仅需要返回一个行数，还要让用户知道一个信息,存在还是不存在 
     //如果我们此时仅仅给servlet返回一个值，让servlet来处理返回什么，这就不对了，处理 业务逻辑是service的活。所以要在service中返回行数和信息
     //至此，我们需要一个对象，里边的属性是，查询出来的行数，以及异常信息
     public ResultInfo ifNameExistAjax(String usernameVal) {

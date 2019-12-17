@@ -30,6 +30,8 @@
                 <a href="${ctx}/UserServlet?action=findById" class="collection">个人中心</a><%--当点击个人中心的时候，应该拿到user对象--%>
                 <a href="cart.jsp" class="collection">购物车</a>
                 <a href="javascript:void(0)" onclick="loginout()">退出</a>
+                    <%--退出按钮，询问框，href=”javascript:void(0);”这个的含义是，让超链接去执行一个js函数，而不是去跳转到一个地址，
+    而void(0)表示一个空的方法，也就是不执行js函数--%>
                 <script>
                     function loginout() {
                         //询问框
@@ -83,10 +85,10 @@
             $.post(url, params, function (resultData) {
                 var json = eval(resultData);
                 //遍历输出
-                var str = " <li class=\"nav-active\"><a href=\"index.jsp\">首页</a></li>"
+                var str = " <li class='nav-active'><a href='index.jsp'>首页</a></li>";
                 $.each(json, function (index, value) {
-                    str += "<li><a href=\"route_list.jsp\">" + value.cname + "</a></li>"
-                })
+                    str += "<li><a href='${ctx}/RouteServlet?action=findAllByCid&pageNumber=1&pageSize=5&cid="+value.cid+"'>" + value.cname + "</a></li>"
+                });
                 $("#categoryUI").html(str);
             }, "json")
         })
@@ -172,7 +174,7 @@
                             </div>
                             <script>
                                 function phoneFormt() {
-                                    var reg = /1[3579]\d{9}/;
+                                    var reg = /^1[35784]\d{9}$/;
                                     var login_telephone = $("#login_telephone").val();
                                     if (login_telephone === "") {
                                         alert("手机号不能为空")
@@ -186,7 +188,9 @@
                                 <input type="text" class="form-control" id="login_check" name="smsCode"
                                        placeholder="请输入手机验证码">
                             </div>
-                            <span id="sendCode"><a href="javaScript:void(0)" id="login_sendSmsCode"  onclick="loginSendCode()">发送手机验证码</a></span>
+                            <%--头部--%>
+                            <span id="sendCode"><a href="javaScript:void(0)" id="login_sendSmsCode"
+                                                   onclick="loginSendCode()">发送手机验证码</a></span>
                         </div>
                         <script>
                             //动态绑定发送手机验证码，href="javaScript:void(0) 阻止链接

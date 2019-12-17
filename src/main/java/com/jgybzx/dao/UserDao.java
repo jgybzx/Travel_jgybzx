@@ -18,6 +18,8 @@ public interface UserDao {
 
     void save(User user);
 
+    void saveAddress(Address address);
+
     int phoneIfExists(String telephone);
 
 
@@ -31,7 +33,6 @@ public interface UserDao {
 
     List<Address> findUserAddress(Integer uid);
 
-    void saveAddress(Address address);
 
     void setAddDef(Integer uid);
 
