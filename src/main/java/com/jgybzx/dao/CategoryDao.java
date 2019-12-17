@@ -10,7 +10,8 @@ import java.util.List;
  * @Description: 导航条分类
  * @version:
  */
-public interface CategoryDao  {
+public interface CategoryDao {
     List<Category> showCategory();
 
+    Category selectByCid(String cid);
 }

@@ -40,8 +40,9 @@
                                     <span>&yen;</span>
                                     <span>${data.price}</span>
                                     <span>起</span>
-                                </p>
-                                <p><a href="route_detail.jsp">查看详情</a></p>
+                                    </p>
+                                <%--跳转到showDetailt方法，传递参数，本条数据的id--%>
+                                <p><a href="${ctx}/RouteServlet?action=showDetail&rid=${data.rid}&cid=${data.cid}">查看详情</a></p>
                             </div>
                         </li>
                     </ul>

@@ -8,4 +8,9 @@
     <select id="showCategory" resultType="com.jgybzx.domain.Category">
         select * from tab_category
     </select>
+
+    <!--调套查询，根据id获得数据-->
+    <select id="selectByCid" resultType="com.jgybzx.domain.Category">
+        select * from tab_category where cid = #{cid}
+    </select>
 </mapper>
