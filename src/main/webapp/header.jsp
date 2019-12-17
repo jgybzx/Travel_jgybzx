@@ -54,10 +54,22 @@
                 <a href="/"><img src="images/logo.jpg" alt=""></a>
             </div>
             <div class="search">
-                <input id="rname" name="rname" type="text" placeholder="请输入路线名称" class="search_input" value="${rname}"
-                       autocomplete="off">
+                <input id="rname" name="rname" type="text" placeholder="请输入路线名称" class="search_input" value="${searchName}"
+                       autocomplete="off" >
                 <a href="javascript:void(0);" onclick="searchClick()" class="search-button">搜索</a>
             </div>
+            <%--搜索按钮需要根据不同的条件查询--%>
+            <script>
+                function searchClick() {
+                    //获取搜索框 中的数据，也能没有值
+                    var searchName = $("#rname").val();
+                    //获取当前分类 的 cid ，也可能没有值 catagory表
+                    var cid = "${cid}"; // 从域中获取，RouteServlet
+
+                    //通过请求之间改变 地址栏中的地址即可
+                    location.href = "${ctx}/RouteServlet?action=findAllByCid&cid="+cid+"&searchName="+searchName;
+                }
+            </script>
             <div class="hottel">
                 <div class="hot_pic">
                     <img src="images/hot_tel.jpg" alt="">
@@ -87,7 +99,7 @@
                 //遍历输出
                 var str = " <li class='nav-active'><a href='index.jsp'>首页</a></li>";
                 $.each(json, function (index, value) {
-                    str += "<li><a href='${ctx}/RouteServlet?action=findAllByCid&pageNumber=1&pageSize=5&cid="+value.cid+"'>" + value.cname + "</a></li>"
+                    str += "<li><a href='${ctx}/RouteServlet?action=findAllByCid&pageNumber=1&pageSize=5&cid=" + value.cid + "'>" + value.cname + "</a></li>"
                 });
                 $("#categoryUI").html(str);
             }, "json")
