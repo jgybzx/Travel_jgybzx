@@ -28,7 +28,7 @@
             <div class="login">
                 <span>欢迎回来：<font color="#48d1cc" size="3px">${loginUser.username}&nbsp;&nbsp;&nbsp;&nbsp;</font></span>
                 <a href="${ctx}/UserServlet?action=findById" class="collection">个人中心</a><%--当点击个人中心的时候，应该拿到user对象--%>
-                <a href="cart.jsp" class="collection">购物车</a>
+                <a href="${ctx}/CartServlet?action=findCart&uid=${loginUser.uid}" class="collection">购物车</a>
                 <a href="javascript:void(0)" onclick="loginout()">退出</a>
                     <%--退出按钮，询问框，href=”javascript:void(0);”这个的含义是，让超链接去执行一个js函数，而不是去跳转到一个地址，
     而void(0)表示一个空的方法，也就是不执行js函数--%>
@@ -51,7 +51,7 @@
     <div class="header_wrap">
         <div class="topbar">
             <div class="logo">
-                <a href="/"><img src="images/logo.jpg" alt=""></a>
+                <a href=""><img src="images/logo.jpg" alt=""></a>
             </div>
             <div class="search">
                 <input id="rname" name="rname" type="text" placeholder="请输入路线名称" class="search_input" value="${searchName}"

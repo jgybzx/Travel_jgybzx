@@ -107,7 +107,7 @@ public class BeanFactoryUtils {
                                         "方法 \n@@  参数" + args +
                                         "\n@@ 时间：" + date;
                                 //==================将信息写入日志
-                                File file = new File("d:/Travel项目运行日志.txt");
+                                File file = new File("Travel项目运行日志.txt");
                                 if(!file.exists()){
                                     file.createNewFile();
                                 }

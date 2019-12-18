@@ -190,6 +190,7 @@ public class UserServlet extends BaseServlet {
      */
     public void pwdLogin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResultInfo resultInfo = null;
+
         //获取前台传递的用户名密码
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -307,7 +308,7 @@ public class UserServlet extends BaseServlet {
         //1.1,调用service获取用户
         UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         User user = userService.findById(uid);
-        System.out.println("user = " + user);
+//        System.out.println("user = " + user);
         //2.设置数据，请求转发
         request.setAttribute("user", user);
         request.getRequestDispatcher("home_index.jsp").forward(request, response);

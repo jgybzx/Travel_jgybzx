@@ -36,7 +36,7 @@
                     </c:if>
                     <c:if test="${status.count > 4}">
                         <a title="" class="little_img" style="display:none" data-bigpic="${img.bigPic}">
-                        <img src="${img.smallPic}">
+                            <img src="${img.smallPic}">
                         </a>
                     </c:if>
                 </c:forEach>
@@ -54,19 +54,37 @@
             </div>
             <div class="pros_price">
                 <p class="price">
-                    <strong>￥ ${route.price}.00</strong>
+                    <strong>￥ ${route.price}</strong>
                 </p>
                 <div class="p_number">
                     <div class="f_l add_chose">
                         <a class="reduce" onClick="setAmount.reduce('#qty_item_1')" href="javascript:void(0)">-</a>
+                        <%--加入购物车按钮  前边的数量 --%>
                         <input type="text" name="qty_item_1" value="1" id="qty_item_1"
                                onKeyUp="setAmount.modify('#qty_item_1')" class="text"/>
                         <a class="add" onClick="setAmount.add('#qty_item_1')" href="javascript:void(0)">+</a>
                     </div>
                     <span class="collect">
-                         <a class="btn" href="cart_success.jsp" id="addCart"><i
+                         <a class="btn" href="javascript:void(0)" id="addCart"><i
                                  class="glyphicon glyphicon-heart-empty"></i>加入购物车</a>
                     </span>
+                    <script>
+                        $(function () {
+                            //点击添加到购物车，首先判断用户是否登陆，如果登陆了，域中应该有一个loginUser
+                            $("#addCart").click(function () {
+                                if (${empty loginUser}) {
+                                    //直接弹出登陆模态框，相当于点击了一次登陆
+                                    $("#loginBtn").click();
+                                } else {
+                                    //传递参数，然后进行地址跳转
+                                    var count = $("#qty_item_1").val();
+                                    var rid = ${route.rid};
+                                    location.href = "${ctx}/CartServlet?action=addCart&count="+count+"&rid="+rid;
+                                }
+                            })
+
+                        })
+                    </script>
                 </div>
 
             </div>
