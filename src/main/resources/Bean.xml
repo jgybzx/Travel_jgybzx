@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Benas>
+    <Bean id ="UserService" class = "com.jgybzx.service.imp.UserServiceIml"> </Bean>
+    <Bean id ="CategoryService" class = "com.jgybzx.service.imp.CategoryServiceIml"> </Bean>
+    <Bean id ="RouteService" class = "com.jgybzx.service.imp.RouteServiceIml"> </Bean>
+</Benas>

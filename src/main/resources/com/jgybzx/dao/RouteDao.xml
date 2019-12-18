@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace 是Dao的全类名，
+    之前是随便起名，namespace.id可以定位到sql语句
+    之后是通过反射+代理实现接口的方式，所以要写接口全类名
+-->
+<mapper namespace="com.jgybzx.dao.RouteDao">
+    <!--各种标签-->
+    <!--
+        标签id与接口方法名一致
+        标签 parameterType 参数类型
+        resultType 返回值类型
+            增删改  没有resultType属性，所以接口中的方法可以写为无返回值，
+            但实际是返回被影响的行数
+    -->
+
+    <select id="findData" resultType="com.jgybzx.domain.Route">
+        select * from tab_route where cid = #{cid} limit #{startindex}, #{pageSize}
+    </select>
+    <select id="totalCountByCid" resultType="java.lang.Integer">
+        select count(*) from tab_route where cid = #{cid}
+    </select>
+    <!--  //根据搜索框和分类id动态查询-->
+
+    <select id="findByCondition" resultType="com.jgybzx.domain.Route">
+        select * from tab_route
+        <where>
+            <if test="cid!=null and cid!=''">
+                and cid = #{cid}
+            </if>
+
+            <if test="searchName!=null and searchName!=''">
+                and rname like concat("%",#{searchName},"%")
+            </if>
+        </where>
+        limit #{startindex}, #{pageSize}
+    </select>
+    <select id="totalCountByCondition" resultType="java.lang.Integer">
+        select count(*) from tab_route
+        <where>
+            <if test="cid!=null and cid!=''">
+                and cid = #{cid}
+            </if>
+
+            <if test="searchName!=null and searchName!=''">
+                and rname like concat("%",#{searchName},"%")
+            </if>
+        </where>
+    </select>
+    <resultMap id="Detailmap" type="route">
+        <id column="rid" property="rid"/>
+        <!--普通字段，如果名字和类属性一致，可以不需要写 -->
+        <!--一对一配置分类-->
+        <association property="category" column="cid" javaType="Category"
+                     select="com.jgybzx.dao.CategoryDao.selectByCid"/>
+        <!--一对一 配置卖家seller-->
+        <association property="seller" column="sid" javaType="Seller"
+                     select="com.jgybzx.dao.SellerDao.getBySid"/>
+        <!--一对多配置图片信息-->
+        <collection property="routeImgList" javaType="list" ofType="RouteImg" column="rid"
+                    select="com.jgybzx.dao.RouteImgDao.findByRid"/>
+
+
+    </resultMap>
+    <select id="showDetail" resultMap="Detailmap">
+        select * from tab_route where rid =#{rid}
+    </select>
+</mapper>
