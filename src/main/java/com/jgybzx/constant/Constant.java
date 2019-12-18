@@ -10,6 +10,7 @@ public interface Constant {
     public static final String loginUser = "loginUser";
     public static final String CART_NAME = "cart_";
     public static final String CART = "cart";
+    public static final String USERADDRESS = "userAddress";
 
 
 }

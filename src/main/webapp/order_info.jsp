@@ -34,13 +34,12 @@
                         <div class="addressInfo">
                             <ul class="addr-detail">
                                 <li class="addr-item">
-
+                                    <%--收货地址div--%>
                                     <div>
-                                        <div class="con address"><input type="radio" name="addressId" value="1"> 张默
-                                            北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span></div>
-                                        <div class="con address"><input type="radio" name="addressId" value="2"> 张默
-                                            北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span></div>
-                                        <div class="clearfix"></div>
+                                        <c:forEach var="address" items="${userAddress}">
+                                        <div class="con address"><input type="radio" id="${address.aid}" ${address.isDefault==1?"checked":""} name="addressId" value="1">
+                                            ${address.contact} ${address.address} <span>${address.telephone}</span></div>
+                                        </c:forEach>
                                     </div>
                                 </li>
                             </ul>
@@ -67,24 +66,28 @@
                             <ul class="send-detail">
                                 <li>
                                     <div class="sendGoods">
-                                        <ul class="yui3-g">
-                                            <li class="yui3-u-1-6">
-                                                <span><img src="images/04-search_03.jpg"/></span>
-                                            </li>
-                                            <li class="yui3-u-7-12">
-                                                <div class="desc">【减100元 含除夕/春节出发】广州增城三英温泉度假酒店/自由行套票</div>
-                                                <div class="seven">7天无理由退货</div>
-                                            </li>
-                                            <li class="yui3-u-1-12">
-                                                <div class="price">￥5399.00</div>
-                                            </li>
-                                            <li class="yui3-u-1-12">
-                                                <div class="num">X1</div>
-                                            </li>
-                                            <li class="yui3-u-1-12">
-                                                <div class="exit">有货</div>
-                                            </li>
-                                        </ul>
+                                        <%--遍历购物车数据中的 cartItmeMap el表达式底层是 entrySet--%>
+                                        <c:forEach var="entry" items="${cart.cartItmeMap}" >
+                                            <ul class="yui3-g">
+                                                <li class="yui3-u-1-6">
+                                                    <span><img src="${entry.value.route.rimage}"/></span>
+                                                </li>
+                                                <li class="yui3-u-7-12">
+                                                    <div class="desc">${entry.value.route.rname}</div>
+                                                    <div class="seven">7天无理由退货</div>
+                                                </li>
+                                                <li class="yui3-u-1-12">
+                                                    <div class="price">￥${entry.value.route.price}</div>
+                                                </li>
+                                                <li class="yui3-u-1-12">
+                                                    <div class="num">X${entry.value.count}</div>
+                                                </li>
+                                                <li class="yui3-u-1-12">
+                                                    <div class="exit">有货</div>
+                                                </li>
+                                            </ul>
+                                        </c:forEach>
+
                                     </div>
                                 </li>
                                 <li></li>
@@ -97,7 +100,7 @@
             </div>
             <div class="clearfix trade">
                 <div class="fc-price">
-                   <span class="number">1</span>件商品，应付金额:　<span class="price">¥5399.00</span>
+                   <span class="number">${cart.cartItmeMap.size()}</span>件商品，应付金额:　<span class="price">¥${cart.totalPrice}</span>
                 </div>
             </div>
             <div class="submit">

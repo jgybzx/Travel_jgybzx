@@ -92,7 +92,7 @@
         </div>
         <div style="text-align:right;margin-top:10px;margin-bottom:10px;">
             <%--点击结算跳转到 orderServlet--%>
-            <a href="${ctx}/OrderServlet?">
+            <a href="${ctx}/OrderServlet?action=submitCart">
                 <input type="button" width="100" value="结算" name="submit" border="0" style="background-color: #ea4a36;
 						height:45px;width:120px;color:white;font-size: 15px">
             </a>

@@ -112,7 +112,6 @@ public class UserServiceIml implements UserService {
             System.out.println("username = " + username);
             System.out.println("password = " + password);
             User user = userDao.findByNamePws(username, password);
-            System.out.println("user = " + user);
             //判断是否有这个用户
             if (user == null) {//没有找到数据
                 resultInfo = new ResultInfo(false, "用户名或密码不正确", null);
@@ -176,7 +175,6 @@ public class UserServiceIml implements UserService {
         try {
             UserDao userDao = sqlSession.getMapper(UserDao.class);
             addresses =userDao.findUserAddress(uid);
-            System.out.println(addresses);
         }finally {
             MyBatisUtils.close(sqlSession);
         }

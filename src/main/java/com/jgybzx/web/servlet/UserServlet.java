@@ -308,7 +308,6 @@ public class UserServlet extends BaseServlet {
         //1.1,调用service获取用户
         UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         User user = userService.findById(uid);
-//        System.out.println("user = " + user);
         //2.设置数据，请求转发
         request.setAttribute("user", user);
         request.getRequestDispatcher("home_index.jsp").forward(request, response);
@@ -333,16 +332,13 @@ public class UserServlet extends BaseServlet {
             //2。获取图片数据.getPart("pic");,参数是input 标签里边的name
             Part picPart = request.getPart("pic");//获取图片对象
             long size = picPart.getSize();//获取图片大小，当上传图片的时候才进行更新
-//            System.out.println("size = " + size);
             if (size > 0) {
                 //将图片存储到本地磁盘  一般放在项目部署的路径下
                 //1、获得img在本地的真实路径
                 String realPath = request.getServletContext().getRealPath("/img/");
-//                System.out.println("realPath = " + realPath);
 
                 //2.为了防止同名过图片覆盖，随机生成图片的名字
                 String filename = UuidUtils.getUuid().toString() + ".png";
-//                System.out.println("filename = " + filename);
 
                 //3.使用文件输出流，向指定地址写入文件
                 FileOutputStream outputStream = new FileOutputStream(realPath + filename);
@@ -384,12 +380,8 @@ public class UserServlet extends BaseServlet {
         System.out.println("findUserAddress执行");
         User loginUser = (User) request.getSession().getAttribute("loginUser");
         Integer uid = loginUser.getUid();
-//        System.out.println(loginUser);
         UserService userService = (UserService)BeanFactoryUtils.getBean("UserService");
         List<Address> addressList = userService.findUserAddress(uid);
-//        for (Address address : addressList) {
-//            System.out.println("address = " + address);
-//        }
         request.setAttribute("addressList", addressList);
         //由于要显示在页面，所以请求转发
         request.getRequestDispatcher("home_address.jsp").forward(request, response);
