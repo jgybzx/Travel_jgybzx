@@ -16,7 +16,9 @@
 <%@include file="header.jsp"%>
 
 <div class="container-fluid">
-    <form action="pay.jsp" method="post">
+    <form action="${ctx}/OrderServlet" method="post">
+        <%--表单隐藏域，--%>
+        <input type="text" name="action" value="submitOrder" hidden>
         <!-- 头部 end -->
         <div class="cart py-container">
             <!--主内容-->

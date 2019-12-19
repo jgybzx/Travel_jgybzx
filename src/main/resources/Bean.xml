@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Benas>
-    <Bean id ="UserService" class = "com.jgybzx.service.imp.UserServiceIml"> </Bean>
-    <Bean id ="CategoryService" class = "com.jgybzx.service.imp.CategoryServiceIml"> </Bean>
-    <Bean id ="RouteService" class = "com.jgybzx.service.imp.RouteServiceIml"> </Bean>
+    <Bean id="UserService" class="com.jgybzx.service.imp.UserServiceIml"/>
+    <Bean id="CategoryService" class="com.jgybzx.service.imp.CategoryServiceIml"/>
+    <Bean id="RouteService" class="com.jgybzx.service.imp.RouteServiceIml"/>
+    <Bean id="AddressService" class="com.jgybzx.service.imp.AddressServiceIml"/>
 </Benas>

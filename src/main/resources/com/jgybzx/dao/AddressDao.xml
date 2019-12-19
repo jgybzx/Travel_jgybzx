@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--
+    namespace 是Dao的全类名，
+    之前是随便起名，namespace.id可以定位到sql语句
+    之后是通过反射+代理实现接口的方式，所以要写接口全类名
+-->
+<mapper namespace="com.jgybzx.dao.AddressDao">
+    <!--各种标签-->
+    <!--
+        标签id与接口方法名一致
+        标签 parameterType 参数类型
+        resultType 返回值类型
+            增删改  没有resultType属性，所以接口中的方法可以写为无返回值，
+            但实际是返回被影响的行数
+    -->
+
+    <select id="findAddressByid" resultType="com.jgybzx.domain.Address">
+        select  * from tab_address where aid = #{aid}
+    </select>
+</mapper>

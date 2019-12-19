@@ -39,7 +39,7 @@ public class BeanFactoryUtils {
             e.printStackTrace();
         }
         return o;
-    }*/ //通过配置文件获取对象
+    } //通过配置文件获取对象*/
 
     /**
      *  //    表示从任意位置开始  //bean
@@ -118,7 +118,7 @@ public class BeanFactoryUtils {
 
 
                                 Object returnObj = method.invoke(finalObject, args);
-                                /*Object returnObj = method.invoke(object, args);  此处直接写object会报错*/
+//                                Object returnObj = method.invoke(object, args);  此处直接写object会报错
                                 return returnObj;
                             }
                         });
