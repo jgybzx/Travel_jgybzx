@@ -149,7 +149,10 @@ public class OrderServlet extends BaseServlet {
         jedisBean1.close();
 
         //3.响应数据
-        request.getRequestDispatcher("pay.jsp").forward(request,response);
+//        request.getRequestDispatcher("pay.jsp").forward(request,response);
+        //跳转生成支付连接的 servletr
+        response.sendRedirect(request.getContextPath()+"/PayServlet?action=CreateCodeUrl&oid="+order.getOid()+"&totalPrice="+redisCart.getTotalPrice());
+
 
     }
 

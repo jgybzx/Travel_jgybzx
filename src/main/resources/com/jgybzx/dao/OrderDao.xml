@@ -12,6 +12,16 @@
         insert into  tab_order (oid ,ordertime ,total ,state ,address ,contact ,telephone ,uid ) values
         (#{oid },#{ordertime},#{total},#{state},#{address},#{contact},#{telephone},	#{user.uid});
     </insert>
+    <!--修改订单状态-->
+    <update id="changeOrderState">
+        update  tab_order  set state = 1 where oid = #{oid}
+    </update>
+
+    <!--检查订单状态-->
+    <select id="sheckOrderState" resultType="java.lang.String">
+        select state  from  tab_order where oid= #{oid}
+
+    </select>
     <!--各种标签-->
     <!--
         标签id与接口方法名一致

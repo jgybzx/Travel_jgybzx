@@ -11,4 +11,8 @@ import com.jgybzx.domain.Order;
 public interface OrderDao {
     //保存 order数据
     void save(Order order);
+    //修改订单状态
+    void changeOrderState(String oid);
+
+    String sheckOrderState(String oid);
 }
