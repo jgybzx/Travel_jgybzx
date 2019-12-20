@@ -16,7 +16,8 @@ public class PayUtils {
 
     private static WXPay wxPay;
 
-    // 支付成功回调地址
+    // 支付成功回调地址，http://za2grs.natappfree.cc改地址如果使用natapp申请的，每次都是变化的因为是免费的
+    //CallBackServlet  回调地址，不能继承BaseServlet，因为继承之后，是反射调用方法，需要传递action
     private static String notifyUrl = "http://za2grs.natappfree.cc/Travel/CallBackServlet";
 
 

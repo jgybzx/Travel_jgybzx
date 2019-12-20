@@ -28,7 +28,7 @@ public class PayServlet extends BaseServlet {
         String totalPrice = request.getParameter("totalPrice");
 
         System.out.println("oid = " + oid);
-        //获得支付链接
+        //获得支付链接，第一个参数：订单号，第二个：钱，单位  分
         String payUrl = PayUtils.createOrder(oid, 1);
         System.out.println("payUrl = " + payUrl);
 
